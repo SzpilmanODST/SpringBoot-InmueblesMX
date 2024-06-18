@@ -23,11 +23,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -112,6 +113,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .roles(roleEntitySet)
+                .name(authCreateUserRequest.name())
+                .lastName(authCreateUserRequest.lastName())
+                .email(authCreateUserRequest.email())
+                .cellphone(authCreateUserRequest.cellphone())
                 .isEnable(true)
                 .accountNoLocked(true)
                 .accountNoExpired(true)
@@ -144,5 +149,30 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return authResponse;
     }
 
+    // CRUD METHODS
 
+    @Override
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public Optional<UserEntity> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+        return userRepository.findUserEntityByUsername(username).orElseThrow();
+    }
+
+    @Override
+    public void save(UserEntity userEntity) {
+        userRepository.save(userEntity);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
 }

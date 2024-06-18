@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -38,10 +37,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(http -> {
                     // Public endpoints
                     http.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
-                    http.requestMatchers(HttpMethod.GET, "/test/helloAll").permitAll();
+                    http.requestMatchers(HttpMethod.GET, "/properties/findAll").permitAll();
+                    http.requestMatchers(HttpMethod.GET, "/properties/find/{id}").permitAll();
 
                     // Private endpoints
-                    http.requestMatchers(HttpMethod.GET, "/test/hello-protected").hasAnyRole("ADMIN", "BUYER", "SELLER");
+                    http.requestMatchers(HttpMethod.GET, "/users/**").hasAnyRole("ADMIN", "BUYER", "SELLER");
+                    http.requestMatchers(HttpMethod.PUT, "/users/update/{id}").hasAnyRole("ADMIN", "BUYER", "SELLER");
+                    http.requestMatchers(HttpMethod.DELETE, "/users/delete/{id}").hasAnyRole("ADMIN", "BUYER", "SELLER");
+
+                    http.requestMatchers(HttpMethod.GET, "/properties/find/{id}/auth").hasAnyRole("ADMIN", "BUYER", "SELLER");
+                    http.requestMatchers(HttpMethod.POST, "/properties/save").hasAnyRole("SELLER");
+                    http.requestMatchers(HttpMethod.PUT, "/properties/update/{id}").hasAnyRole("SELLER");
+                    http.requestMatchers(HttpMethod.DELETE, "/properties/delete/{id}").hasAnyRole("SELLER", "ADMIN");
+
+                    http.requestMatchers(HttpMethod.GET, "/photos/find{id}").hasAnyRole("ADMIN", "SELLER");
+                    http.requestMatchers(HttpMethod.GET, "/photos/view/{photoName}").hasAnyRole("ADMIN", "SELLER");
+                    http.requestMatchers(HttpMethod.DELETE, "photos/delete/{id}").hasAnyRole("ADMIN", "SELLER");
+                    http.requestMatchers(HttpMethod.POST, "photos/save").hasAnyRole("SELLER");
 
                     // Not specified endpoints
                     http.anyRequest().denyAll();
